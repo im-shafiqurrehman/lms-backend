@@ -16,7 +16,7 @@ const accessTokenExpire = parseInt(
   10
 );
 const RefreshTokenExpire = parseInt(
-  process.env.Refresh_TOKEN_EXPIRE || "1200",
+  process.env.REFRESH_TOKEN_EXPIRE || "1200",
   10
 );
 
@@ -24,14 +24,16 @@ export const accessTokenOptions: ITokenOptions = {
   expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
   maxAge: accessTokenExpire * 60 * 60 * 1000,
   httpOnly: true,
-  sameSite: "lax",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  secure: process.env.NODE_ENV === "production",
 };
 
 export const refreshTokenOptions: ITokenOptions = {
   expires: new Date(Date.now() + RefreshTokenExpire * 24 * 60 * 60 * 1000),
   maxAge: RefreshTokenExpire * 24 * 60 * 60 * 1000,
   httpOnly: true,
-  sameSite: "lax",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  secure: process.env.NODE_ENV === "production",
 };
 export const sendToken = (user: Iuser, statusCode: number, res: Response) => {
   const accessToken = user.SignAccessToken();
@@ -40,12 +42,7 @@ export const sendToken = (user: Iuser, statusCode: number, res: Response) => {
   //upload session to redis
   redis.set(user._id, JSON.stringify(user) as any);
 
-  //parse environment variables to integerate  with fallback values
-
-  if (process.env.NODE_ENV === "production") {
-    accessTokenOptions.secure = true;
-  }
-  console.log("LOgin");
+  console.log("Login successful");
   res.cookie("access_token", accessToken, accessTokenOptions);
   res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 

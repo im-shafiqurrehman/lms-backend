@@ -300,7 +300,9 @@ export const socialAuth = CatchAsyncError(
       } else {
         sendToken(user, 200, res);
       }
-    } catch (error) {}
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
   }
 );
 
@@ -331,7 +333,9 @@ export const updateUserInfo = CatchAsyncError(
         success: true,
         user,
       });
-    } catch (error) {}
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
   }
 );
 

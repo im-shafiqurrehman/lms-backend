@@ -192,7 +192,9 @@ exports.socialAuth = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, ne
             (0, jwt_1.sendToken)(user, 200, res);
         }
     }
-    catch (error) { }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 400));
+    }
 });
 exports.updateUserInfo = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
@@ -209,7 +211,9 @@ exports.updateUserInfo = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res
             user,
         });
     }
-    catch (error) { }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 400));
+    }
 });
 //change password
 exports.updatePassword = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {

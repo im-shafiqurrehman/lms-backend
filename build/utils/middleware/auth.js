@@ -10,7 +10,20 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const redis_1 = require("../redis");
 const user_controller_1 = require("../../controllers/user.controller");
 exports.isAuthenticated = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    const access_token = req.cookies.access_token;
+    let access_token = req.cookies.access_token;
+    // Fallback to Authorization header if cookie is not present
+    if (!access_token) {
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            access_token = authHeader.substring(7);
+        }
+    }
+    // Debug logging for production
+    if (process.env.NODE_ENV === "production") {
+        console.log("🔍 Auth Debug - Has access_token:", !!access_token);
+        console.log("🔍 Auth Debug - Cookies:", Object.keys(req.cookies));
+        console.log("🔍 Auth Debug - Has Authorization header:", !!req.headers.authorization);
+    }
     if (!access_token) {
         return next(new ErrorHandler_1.default("Please login to access this resource", 400));
     }

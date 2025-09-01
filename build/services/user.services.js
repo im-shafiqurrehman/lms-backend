@@ -13,6 +13,17 @@ const getUserById = async (id, res) => {
         const user = JSON.parse(userjson);
         res.status(201).json({ success: true, user });
     }
+    else {
+        // If user not found in Redis, try to get from database and save to Redis
+        const user = await user_model_1.default.findById(id);
+        if (user) {
+            await redis_1.redis.set(id, JSON.stringify(user), "EX", 604800); // 7 days
+            res.status(201).json({ success: true, user });
+        }
+        else {
+            res.status(400).json({ success: false, message: "User not found" });
+        }
+    }
 };
 exports.getUserById = getUserById;
 //get All users --->only for admin

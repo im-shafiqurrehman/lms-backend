@@ -8,6 +8,15 @@ export const getUserById = async (id: string, res: Response) => {
   if (userjson) {
     const user = JSON.parse(userjson);
     res.status(201).json({ success: true, user });
+  } else {
+    // If user not found in Redis, try to get from database and save to Redis
+    const user = await userModel.findById(id);
+    if (user) {
+      await redis.set(id, JSON.stringify(user), "EX", 604800); // 7 days
+      res.status(201).json({ success: true, user });
+    } else {
+      res.status(400).json({ success: false, message: "User not found" });
+    }
   }
 };
 

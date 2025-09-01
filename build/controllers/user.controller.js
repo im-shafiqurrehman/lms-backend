@@ -164,7 +164,11 @@ exports.updateAccessToken = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
         res.cookie("access_token", accessToken, jwt_1.accessTokenOptions);
         res.cookie("refresh_token", refreshToken, jwt_1.refreshTokenOptions);
         await redis_1.redis.set(user._id, JSON.stringify(user), "EX", 604800);
-        return next();
+        res.status(200).json({
+            success: true,
+            accessToken,
+            user,
+        });
     }
     catch (error) {
         return next(new ErrorHandler_1.default(error.message, 400));
